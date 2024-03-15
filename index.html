@@ -4,12 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title></title>
-    <link href="css/style.css" rel="stylesheet" />
     <script src="snake.js" lang="javascript"></script>
-    />
+    <style>
+      body {
+        margin: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: gray;
+        align-items: center;
+        height: 100vh;
+        font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+          "Lucida Sans", Arial, sans-serif;
+        font-size: large;
+      }
+      p {
+        min-height: 8rem;
+        text-align: center;
+      }
+    </style>
   </head>
 
   <body>
-    <canvas id="game" width="800" height="800"></canvas>
+    <canvas id="game" width="800" height="400"></canvas>
+    <br />
+    <p id="message"></p>
   </body>
 </html>
