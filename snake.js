@@ -5,6 +5,7 @@ const H = 18;
 const SCALE = 20;
 const GAP = 5;
 const O = SCALE;
+const MIN_TICK = 20; // tick time ms
 let dirX = 1;
 let dirY = 0;
 let paused = false;
@@ -27,6 +28,19 @@ let highscores;
 
 let ctx;
 let arr;
+
+let lastTick;
+let ticks;
+let gameStart;
+let tickInterval = 300;
+
+function setSpeed(val) {
+	gameStart = lastTick = Date.now();
+	ticks = 0;
+	tickInterval = Math.min(1000, Math.max(MIN_TICK, val));
+	console.log("speed:", tickInterval);
+}
+
 window.addEventListener("load", (e) => {
 	highscores = JSON.parse(localStorage.getItem("highscores"));
 	console.log("window onload", highscores);
@@ -45,6 +59,21 @@ window.addEventListener("load", (e) => {
 
 	resetGame();
 	document.body.addEventListener("keydown", (e) => {
+		if (over) {
+			resetGame();
+			return;
+		}
+		if (e.key == " ") {
+			pauseGame(!paused);
+			return;
+		}
+		if (paused) {
+			if (e.key != "Escape") {
+				pauseGame(false);
+				// and then handle action
+			}
+		}
+
 		switch (e.key) {
 			case "d":
 			case "l":
@@ -83,31 +112,35 @@ window.addEventListener("load", (e) => {
 				dirY = -1;
 				break;
 			case "Escape":
-				paused = true;
-				break;
 			case " ":
-				if (over) {
-					resetGame();
-				} else {
-					paused = !paused;
-				}
+				pauseGame(true);
 				break;
 			case "i":
 			case "Enter":
-				paused = false;
+				pauseGame(false);
 				break;
+			case "+": setSpeed(tickInterval - 50); break;
+			case "-": setSpeed(tickInterval + 50); break;
+
 			default:
-		}
-		if (paused) {
-			message("Paused. Space to continue.");
-		} else {
-			message("");
 		}
 	});
 	window.setInterval(() => {
 		if (paused) {
 			return;
 		}
+		if (!document.hasFocus()) {
+			// intervals won't be steady if game was running in the backgroud
+			pauseGame(true);
+		}
+		let duration = Date.now() - gameStart;
+		if (duration / ticks < tickInterval) {
+			return;
+		}
+		ticks++;
+		console.log(Date.now() - lastTick, tickInterval)
+		lastTick = Date.now();
+
 		addFood();
 		prev = Object.assign({}, head);
 		head.x = (head.x + dirX + W) % W;
@@ -136,7 +169,7 @@ window.addEventListener("load", (e) => {
 			snake.push(Object.assign({}, head));
 		}
 		renderFrame();
-	}, 300);
+	}, MIN_TICK * 0.618);
 });
 
 function message(msg) {
@@ -144,19 +177,35 @@ function message(msg) {
 }
 
 function resetGame() {
-	message("Press space to start.")
 	snake = [];
 	snakeLength = 2;
 	dirX = 1;
 	dirY = 0;
 	arr = arr2D(W, H);
 	over = false;
-	paused = true;
 	prev = new point(-1, -1);
 	head = new point(1, 2);
 	snake.push(Object.assign({}, head));
 	arr[1][2] = 1;
-	renderFrame();
+	renderFrame(); // order?
+	pauseGame(true);
+	message("Press space to start.")
+}
+
+function pauseGame(val) {
+	if (val == true) {
+		ticks = 0;
+		gameStart = Date.now();
+		lastTick = Date.now();
+		paused = true;
+		message("Paused. Space to continue.");
+	} else {
+		ticks = 0;
+		gameStart = Date.now();
+		lastTick = Date.now();
+		paused = false;
+		message("");
+	}
 }
 
 function addFood() {
