@@ -25,6 +25,8 @@ class point {
 
 let head = new point;
 let highscores;
+let form;
+let resultSaved;
 
 let ctx;
 let arr;
@@ -33,6 +35,7 @@ let lastTick;
 let ticks;
 let gameStart;
 let tickInterval = 300;
+
 
 function setSpeed(val) {
 	gameStart = lastTick = Date.now();
@@ -44,11 +47,30 @@ function setSpeed(val) {
 window.addEventListener("load", (e) => {
 	highscores = JSON.parse(localStorage.getItem("highscores"));
 	console.log("window onload", highscores);
+	// TODO: check {name:string, score:int}
 	if (highscores === null) {
 		highscores = [];
 	}
-	highscores.map(a => parseInt(a))
 	console.log("window onload", highscores);
+
+	form = document.getElementById("formscore");
+	form.addEventListener("submit", (ev) => {
+		ev.preventDefault();
+		if (resultSaved == true) {
+			return;
+		}
+		const name = form.querySelector("#name").value;
+		highscores.push({ name: name, score: snakeLength });
+		highscores.sort((a, b) => b.score - a.score); // reverse order
+		highscores = highscores.slice(0, 3);
+		console.dir(name, highscores);
+		localStorage.setItem("highscores", JSON.stringify(highscores));
+
+		form.style.display = "none";
+		resultSaved = true;
+		message("Result saved.");
+	});
+
 	canvas = document.getElementById("game");
 	msgBox = document.getElementById("message");
 	canvas.width = ((W + 2) * SCALE);
@@ -60,7 +82,11 @@ window.addEventListener("load", (e) => {
 	resetGame();
 	document.body.addEventListener("keydown", (e) => {
 		if (over) {
-			resetGame();
+			if (resultSaved) {
+				resetGame();
+			} else {
+				message("Save your result first.")
+			}
 			return;
 		}
 		if (e.key == " ") {
@@ -138,7 +164,7 @@ window.addEventListener("load", (e) => {
 			return;
 		}
 		ticks++;
-		console.log(Date.now() - lastTick, tickInterval)
+		// console.log(Date.now() - lastTick, tickInterval)
 		lastTick = Date.now();
 
 		addFood();
@@ -152,14 +178,14 @@ window.addEventListener("load", (e) => {
 			console.log("self intersection: game over");
 			paused = true;
 			over = true;
-			highscores.push(snakeLength);
-			highscores.sort((a, b) => b - a); // reverse order
-			highscores = highscores.slice(0, 3);
-			console.dir(highscores);
-			localStorage.setItem("highscores", JSON.stringify(highscores));
+			// TODO: show form only if actually high score
+			form.style.display = "block";
 
-			let hs = highscores.map((a, i) => `<small>${i + 1}:</small> ${a}`).join(", ");
-			message(`Game over! Your score: ${snakeLength}. Press space to play again.<br>High scores: ${hs}`)
+			let hs = highscores.map((a, i) => `<small>${i + 1}</small> ${a.name}: ${a.score}`).join(", ");
+			message(`Press space to play again.<br>High scores: ${hs}`);
+			[...document.querySelectorAll(".show-score")].forEach((a) => {
+				a.innerHTML = snakeLength;
+			});
 		} else {
 			arr[head.x][head.y] = 1;
 			if (snake.length >= snakeLength) {
@@ -177,6 +203,7 @@ function message(msg) {
 }
 
 function resetGame() {
+	resultSaved = false;
 	snake = [];
 	snakeLength = 2;
 	dirX = 1;
