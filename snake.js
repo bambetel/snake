@@ -49,7 +49,7 @@ window.addEventListener("load", (e) => {
 			case "d":
 			case "l":
 			case "ArrowRight":
-				if (prev.x == head.x + 1) {
+				if (prev.x == head.x + 1 || prev.x == 0) {
 					break;
 				}
 				dirX = 1;
@@ -58,7 +58,7 @@ window.addEventListener("load", (e) => {
 			case "a":
 			case "h":
 			case "ArrowLeft":
-				if (prev.x == head.x - 1) {
+				if (prev.x == head.x - 1 || prev.x == W - 1) {
 					break;
 				}
 				dirX = -1;
@@ -67,7 +67,7 @@ window.addEventListener("load", (e) => {
 			case "s":
 			case "j":
 			case "ArrowDown":
-				if (prev.y == head.y + 1) {
+				if (prev.y == head.y + 1 || prev.y == 0) {
 					break;
 				}
 				dirX = 0;
@@ -76,7 +76,7 @@ window.addEventListener("load", (e) => {
 			case "w":
 			case "k":
 			case "ArrowUp":
-				if (prev.y == head.y - 1) {
+				if (prev.y == head.y - 1 || prev.y == H - 1) {
 					break;
 				}
 				dirX = 0;
@@ -126,7 +126,7 @@ window.addEventListener("load", (e) => {
 			localStorage.setItem("highscores", JSON.stringify(highscores));
 
 			let hs = highscores.map((a, i) => `<small>${i + 1}:</small> ${a}`).join(", ");
-			message(`Game over! Your score ${snakeLength}. Press space to play again.<br>High scores: ${hs}`)
+			message(`Game over! Your score: ${snakeLength}. Press space to play again.<br>High scores: ${hs}`)
 		} else {
 			arr[head.x][head.y] = 1;
 			if (snake.length >= snakeLength) {
