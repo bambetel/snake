@@ -104,7 +104,7 @@ window.addEventListener("load", (e) => {
 			case "d":
 			case "l":
 			case "ArrowRight":
-				if (prev.x == head.x + 1 || prev.x == 0) {
+				if (prev.x == head.x + 1 || head.x == W - 1 && prev.x == 0) {
 					break;
 				}
 				dirX = 1;
@@ -113,7 +113,7 @@ window.addEventListener("load", (e) => {
 			case "a":
 			case "h":
 			case "ArrowLeft":
-				if (prev.x == head.x - 1 || prev.x == W - 1) {
+				if (prev.x == head.x - 1 || head.x == 0 && prev.x == W - 1) {
 					break;
 				}
 				dirX = -1;
@@ -122,7 +122,7 @@ window.addEventListener("load", (e) => {
 			case "s":
 			case "j":
 			case "ArrowDown":
-				if (prev.y == head.y + 1 || prev.y == 0) {
+				if (prev.y == head.y + 1 || head.y == H - 1 && prev.y == 0) {
 					break;
 				}
 				dirX = 0;
@@ -131,7 +131,7 @@ window.addEventListener("load", (e) => {
 			case "w":
 			case "k":
 			case "ArrowUp":
-				if (prev.y == head.y - 1 || prev.y == H - 1) {
+				if (prev.y == head.y - 1 || head.y == 0 && prev.y == H - 1) {
 					break;
 				}
 				dirX = 0;
